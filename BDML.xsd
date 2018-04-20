@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- edited with XMLSpy v2016 rel. 2 (x64) (http://www.altova.com) by SIX Beranger (CCAMY SYSTEMES) -->
+<!--/**************************************************************************
+ *  This file is part of HBGML                                        *
+ *  Copyright (C) 2006 by Wolfgang Borutzky
+ *  edited by  Beranger Six  2018     *                                         *
+ *                                                                        *
+ * This library is free software; you can redistribute it and/or          *
+ * modify it under the terms of the Lesser GNU Library General Public            *
+ * License as published by the Free Software Foundation; either           *
+ * version 3 of the License, or (at your option) any later version.       *
+ *                                                                        *
+ * This library is distributed in the hope that it will be useful,        *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of         *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU      *
+ * Library General Public License for more details.                       *
+ *                                                                        *
+ * You should have received a copy of the Lesser GNU Library General Public      *
+ * License along with this library; if not, write to the                  *
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,       *
+ * Boston, MA  02110-1301  USA                                            *
+ **************************************************************************/ -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<!-- ''''''''''''''''''''''''''''''' include all feww things fully common with HBGML ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''-->
+	<xsd:include schemaLocation="lib_ML.xsd"/>
+	<!-- port-->
+	<xsd:complexType name="signal_inType">
+		<xsd:complexContent>
+			<xsd:extension base="portType">
+				<xsd:attribute name="orientation" type="orientationType" fixed="in"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="signal_outType">
+		<xsd:complexContent>
+			<xsd:extension base="portType">
+				<xsd:attribute name="orientation" type="orientationType" fixed="out"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="logic_inType">
+		<xsd:complexContent>
+			<xsd:extension base="portType">
+				<xsd:attribute name="orientation" type="orientationType" fixed="in"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="logic_outType">
+		<xsd:complexContent>
+			<xsd:extension base="portType">
+				<xsd:attribute name="orientation" type="orientationType" fixed="out"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- define ports class to be called-->
+	<xsd:complexType name="BD_portsType">
+		<xsd:sequence>
+			<xsd:element name="signal_in" type="signal_inType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="signal_out" type="signal_outType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="logic_in" type="logic_inType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="logic_out" type="logic_outType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="logic_lineType">
+		<xsd:complexContent>
+			<xsd:extension base="lineType"/>
+			<!-- true bond active , false not active-->
+			<!-- true causality next to half arrow, false the opposite-->
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="lines">
+		<!-- we do not use signals because it is forbidden in QT-->
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="line" type="lineType" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element name="line_logic" type="logic_lineType" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!-- ''''''''''''''''''''''''''''''' BD element ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''-->
+	<xsd:complexType name="BD-elem_template" abstract="true">
+		<xsd:sequence>
+			<xsd:element name="ports" type="BD_portsType" minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="BD-signal_generator">
+		<xsd:complexContent>
+			<xsd:extension base="BD-elem_template">
+				<xsd:sequence>
+					<xsd:element name="parameter" type="xsd:float" minOccurs="0" maxOccurs="1"/>
+					<!-- default val -->
+					<xsd:element name="editable" type="xsd:boolean" minOccurs="0" maxOccurs="1"/>
+					<!-- true we could modified value during smu -->
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BD-signal_detector">
+		<xsd:complexContent>
+			<xsd:extension base="BD-elem_template">
+				<xsd:sequence/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BD-logic_generator">
+		<xsd:complexContent>
+			<xsd:extension base="BD-elem_template">
+				<xsd:sequence>
+					<xsd:element name="parameter" type="xsd:float" minOccurs="0" maxOccurs="1"/>
+					<!-- gain or pow -->
+					<xsd:element name="editable" type="xsd:boolean" minOccurs="0" maxOccurs="1"/>
+					<!-- true we could modified value during smu -->
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BD-logic_detector">
+		<xsd:complexContent>
+			<xsd:extension base="BD-elem_template">
+				<xsd:sequence/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!--calculation type-->
+	<xsd:complexType name="BD-func">
+		<xsd:complexContent>
+			<xsd:extension base="BD-elem_template">
+				<xsd:sequence>
+					<xsd:element name="parameter" type="xsd:float" minOccurs="0" maxOccurs="1"/>
+					<!-- gain or pow -->
+					<xsd:element name="ic" type="xsd:float" minOccurs="0" maxOccurs="1"/>
+				</xsd:sequence>
+				<xsd:attribute name="type" use="required">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:pattern value="exp"/>
+							<xsd:pattern value="ln"/>
+							<xsd:pattern value="pow"/>
+							<xsd:pattern value="int"/>
+							<xsd:pattern value="deriv"/>
+							<xsd:pattern value="gain"/>
+							<xsd:pattern value="minus"/>
+							<xsd:pattern value="inv"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- calculation type-->
+	<xsd:complexType name="BD-operator">
+		<xsd:complexContent>
+			<xsd:extension base="BD-elem_template">
+				<xsd:sequence>
+					<xsd:element name="parameter" type="xsd:float" minOccurs="0" maxOccurs="1"/>
+					<!-- gain or pow -->
+					<xsd:element name="ic" type="xsd:float" minOccurs="0" maxOccurs="1"/>
+				</xsd:sequence>
+				<xsd:attribute name="type" use="required">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:pattern value="mult"/>
+							<xsd:pattern value="add"/>
+							<xsd:pattern value="div"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- comparator-->
+	<xsd:complexType name="BD-comparator">
+		<xsd:complexContent>
+			<xsd:extension base="BD-elem_template">
+				<xsd:sequence>
+					<xsd:element name="error" type="xsd:float" minOccurs="0" maxOccurs="1"/>
+					<xsd:element name="error_percent" type="xsd:float" minOccurs="0" maxOccurs="1"/>
+					<!-- error admissible for equality and non equality in percent and absolute-->
+					<xsd:element name="ic" type="xsd:boolean" minOccurs="0" maxOccurs="1"/>
+				</xsd:sequence>
+				<xsd:attribute name="type" use="required">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:pattern value="leq"/>
+							<xsd:pattern value="geq"/>
+							<xsd:pattern value="eq"/>
+							<xsd:pattern value="neq"/>
+							<xsd:pattern value="ltn"/>
+							<xsd:pattern value="gtn"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- comparator-->
+	<xsd:complexType name="BD-logic_switch">
+		<xsd:complexContent>
+			<xsd:extension base="BD-elem_template"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BD-switch">
+		<xsd:complexContent>
+			<xsd:extension base="BD-elem_template"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- calculation type-->
+	<xsd:complexType name="BD-logic">
+		<xsd:complexContent>
+			<xsd:extension base="BD-elem_template">
+				<xsd:sequence/>
+				<xsd:attribute name="type" use="required">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:pattern value="AND"/>
+							<xsd:pattern value="OR"/>
+							<xsd:pattern value="XOR"/>
+							<xsd:pattern value="XAND"/>
+							<xsd:pattern value="NOT"/>
+							<xsd:pattern value="NAND"/>
+							<xsd:pattern value="NOR"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BD-port" abstract="true">
+		<xsd:complexContent>
+			<xsd:extension base="BD-elem_template">
+				<xsd:sequence>
+					<xsd:element name="ref_id" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+					<!-- id to the higher level conected port-->
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BD-analog_port_out">
+		<xsd:complexContent>
+			<xsd:extension base="BD-port"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BD-analog_port_in">
+		<xsd:complexContent>
+			<xsd:extension base="BD-port"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BD-logic_port_out">
+		<xsd:complexContent>
+			<xsd:extension base="BD-port"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BD-logic_port_in">
+		<xsd:complexContent>
+			<xsd:extension base="BD-port"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

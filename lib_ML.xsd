@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- edited with XMLSpy v2016 rel. 2 (x64) (http://www.altova.com) by SIX Beranger (CCAMY SYSTEMES) -->
+<!--/**************************************************************************
+ *  This file is part of HBGML                                        *
+ *  Copyright (C) 2006 by Wolfgang Borutzky
+ *  edited by  Beranger Six  2018     *                                         *
+ *                                                                        *
+ * This library is free software; you can redistribute it and/or          *
+ * modify it under the terms of the Lesser GNU Library General Public            *
+ * License as published by the Free Software Foundation; either           *
+ * version 3 of the License, or (at your option) any later version.       *
+ *                                                                        *
+ * This library is distributed in the hope that it will be useful,        *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of         *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU      *
+ * Library General Public License for more details.                       *
+ *                                                                        *
+ * You should have received a copy of the Lesser GNU Library General Public      *
+ * License along with this library; if not, write to the                  *
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,       *
+ * Boston, MA  02110-1301  USA                                            *
+ **************************************************************************/ -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:h="http://www.w3.org/1999/xhtml">
+	<!-- ''''''''''''''''''''''''''''''' imports ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''-->
+	<!-- import all xhtml type-->
+	<!-- define a complex type for colors-->
+	<xsd:complexType name="ColorsType">
+		<xsd:sequence>
+			<xsd:element name="r" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="g" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="b" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="a" type="xsd:int" default="255" minOccurs="1" maxOccurs="1"/>
+			<!-- transparency 0-255(opaque) -->
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- define graphical position -->
+	<xsd:complexType name="Position_type">
+		<xsd:sequence>
+			<xsd:element name="x" type="xsd:decimal" minOccurs="1" maxOccurs="1"/>
+			<!-- x coord from right up coin-->
+			<xsd:element name="y" type="xsd:decimal" minOccurs="1" maxOccurs="1"/>
+			<!-- y coord from right up coin-->
+			<xsd:element name="r" type="xsd:decimal" minOccurs="1" maxOccurs="1"/>
+			<!-- rotation in degree-->
+			<xsd:element name="s" type="xsd:decimal" minOccurs="1" maxOccurs="1"/>
+			<!-- ratio from svg size-->
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- ''''''''''''''''''''''''''''''' docs ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''-->
+	<!-- Define general documentation as an  hmtl -->
+	<xsd:element name="model-description">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:any processContents="skip" minOccurs="1" maxOccurs="1"/>
+				<!-- Containing any documentation element most probably html-->
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!-- Define mail type, simple take from aspnet, not the full  RFC 3696 format (too long)-->
+	<xsd:simpleType name="emailAddress">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[\w_]+([-+.'][\w_]+)*@[\w_]+([-.][\w_]+)*\.[\w_]+([-.][\w_]+)*"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- Define a restrictied string type, only lower case letter, upper case letter, digit and '-' ,'_'-->
+	<xsd:simpleType name="rstring">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="([\w_]+)"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- Define a restrictied string type for mathml var-->
+	<xsd:simpleType name="rstringm">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="([\w_\.;&amp;]+)"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- Define a restrictied string type for bml path, mustr finish by xml-->
+	<xsd:simpleType name="rfile">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="([\w_\\/:]+)((\.)xml)"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- Define a restrictied string type for bml path, mustr finish by xml-->
+	<xsd:simpleType name="rfile_svg_png">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="([\w_\\/:]+)((\.)(svg|png))"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- Define a link to specific xml eqts for HBGML fct-->
+	<xsd:simpleType name="rfile_eqts">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="([\w_\\/:]+)((\.)(xml))"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- Define a restrictied string type for bml path, mustr finish by xml-->
+	<xsd:simpleType name="rpath_xml">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="([\w_\\/]+)"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- models info-->
+	<xsd:complexType name="model-infoType">
+		<xsd:sequence>
+			<xsd:element name="model-name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="model-version" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="model-author" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="model-author-email" type="emailAddress" minOccurs="0" maxOccurs="1"/>
+			<xsd:element ref="model-description" minOccurs="1" maxOccurs="1"/>
+			<!-- path to an svg-->
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- ''''''''''''''''''''''''''''''' connections ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''-->
+	<!-- define a complex type for connections-->
+	<xsd:element name="graphic_lines">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="points" minOccurs="0" maxOccurs="unbounded">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="x" type="xsd:decimal" minOccurs="1" maxOccurs="1"/>
+							<xsd:element name="y" type="xsd:decimal" minOccurs="1" maxOccurs="1"/>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="witdh" type="xsd:decimal" minOccurs="0" maxOccurs="1"/>
+				<xsd:element name="color" type="ColorsType" minOccurs="0" maxOccurs="1"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="Port_adress_type">
+		<xsd:sequence>
+			<xsd:element name="comp_id" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="port_id" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- define a type for bond and signals-->
+	<xsd:complexType name="lineType">
+		<xsd:sequence>
+			<xsd:element name="coord" minOccurs="1" maxOccurs="1">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="from" type="Port_adress_type" minOccurs="1" maxOccurs="1"/>
+						<xsd:element name="to" type="Port_adress_type" minOccurs="1" maxOccurs="1"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element ref="graphic_lines" minOccurs="0" maxOccurs="1"/>
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:int" use="required"/>
+		<xsd:attribute name="dimension" type="xsd:int" use="required"/>
+		<xsd:attribute name="name" type="rstring" use="required"/>
+		<!-- must be unique-->
+		<!-- we do not use signals because it is forbidden in QT-->
+		<!-- print name of connection sig or power-->
+	</xsd:complexType>
+	<!-- ''''''''''''''''''''''''''''''' ports ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''-->
+	<xsd:simpleType name="orientationType" final="restriction">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="in"/>
+			<xsd:enumeration value="out"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="portType" abstract="true" mixed="false">
+		<xsd:sequence>
+			<!-- will contain element-->
+		</xsd:sequence>
+		<xsd:attribute name="name" type="rstring" use="required"/>
+		<xsd:attribute name="id" type="xsd:int" use="required"/>
+		<xsd:attribute name="dimension" type="xsd:int" use="required"/>
+	</xsd:complexType>
+</xsd:schema>

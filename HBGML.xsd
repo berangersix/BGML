@@ -1,0 +1,687 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- édité avec XMLSpy v2018 sp1 (http://www.altova.com) par SIX (Etudiant) -->
+<!-- edited with XMLSpy v2016 rel. 2 (x64) (http://www.altova.com) by SIX Beranger (CCAMY SYSTEMES) -->
+<!--/**************************************************************************
+ *  This file is part of HBGML                                        *
+ *  Copyright (C) 2006 by Wolfgang Borutzky
+ *  edited by  Beranger Six  2018     *                                         *
+ *                                                                        *
+ * This library is free software; you can redistribute it and/or          *
+ * modify it under the terms of the Lesser GNU Library General Public            *
+ * License as published by the Free Software Foundation; either           *
+ * version 3 of the License, or (at your option) any later version.       *
+ *                                                                        *
+ * This library is distributed in the hope that it will be useful,        *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of         *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU      *
+ * Library General Public License for more details.                       *
+ *                                                                        *
+ * You should have received a copy of the Lesser GNU Library General Public      *
+ * License along with this library; if not, write to the                  *
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,       *
+ * Boston, MA  02110-1301  USA                                            *
+ **************************************************************************/ -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:h="http://www.w3.org/1999/xhtml">
+	<!-- ''''''''''''''''''''''''''''''' imports ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''-->
+	<xsd:include schemaLocation="BDML.xsd"/>
+	<!-- ''''''''''''''''''''''''''''''' ports ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''-->
+	<!-- causality  for all elements -->
+	<xsd:simpleType name="causality_Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="indifferent"/>
+			<xsd:pattern value="imposed effort out"/>
+			<xsd:pattern value="imposed flow out"/>
+			<xsd:pattern value="preferred effort out"/>
+			<xsd:pattern value="preferred flow out"/>
+			<xsd:pattern value="complex 0j"/>
+			<xsd:pattern value="complex 1j"/>
+			<xsd:pattern value="complex 0jc"/>
+			<xsd:pattern value="complex 1jc"/>
+			<xsd:pattern value="complex TF"/>
+			<xsd:pattern value="complex GY"/>
+			<xsd:pattern value="complex continuity"/>
+			<xsd:pattern value="dual effort out"/>
+			<xsd:pattern value="dual flow out"/>
+			<!-- effort out if dualised, opposite otherwize-->
+			<!-- flow out if dualised, opposite otherwize-->
+			<!-- for composed model port (Word-BG) , just continue the element causality() same rules as TF-->
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="power_portType" mixed="false">
+		<xsd:complexContent>
+			<xsd:extension base="portType">
+				<xsd:sequence>
+					<xsd:element name="flow" type="rstringm" minOccurs="1" maxOccurs="1"/>
+					<xsd:element name="effort" type="rstringm" minOccurs="1" maxOccurs="1"/>
+				</xsd:sequence>
+				<xsd:attribute name="orientation" type="orientationType" use="optional"/>
+				<xsd:attribute name="domain" use="required">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:pattern value="electric"/>
+							<xsd:pattern value="hydraulic"/>
+							<xsd:pattern value="pneumatic"/>
+							<xsd:pattern value="mech_translation"/>
+							<xsd:pattern value="mech_rotation"/>
+							<xsd:pattern value="chemical"/>
+							<xsd:pattern value="heat"/>
+							<xsd:pattern value="undefined"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+				<xsd:attribute name="causality" type="causality_Type" use="required"/>
+				<xsd:attribute name="causality_diag" type="causality_Type" use="required"/>
+			</xsd:extension>
+			<!-- diagnosis causality if different-->
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="bondType">
+		<xsd:complexContent>
+			<xsd:extension base="lineType">
+				<xsd:attribute name="flow" type="xsd:string" use="required"/>
+				<xsd:attribute name="effort" type="xsd:string" use="required"/>
+				<xsd:attribute name="causality" type="xsd:boolean" use="optional"/>
+				<xsd:attribute name="causality_diag" type="xsd:boolean" use="optional"/>
+			</xsd:extension>
+			<!-- true causality next to half arrow, false the opposite-->
+			<!-- strong_causality : true does not change on discrete change, false it change-->
+			<!-- hal_arrow : true it's an half arrow, false full arrow for sensor-->
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="powerhybrid_portType">
+		<xsd:complexContent>
+			<xsd:extension base="power_portType"/>
+			<!-- nothing in extension but could evolve-->
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- define ports class to be called-->
+	<xsd:complexType name="BG_portsType">
+		<xsd:complexContent>
+			<xsd:extension base="BD_portsType">
+				<xsd:sequence>
+					<xsd:element name="power" type="power_portType" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element name="power_hybrid" type="powerhybrid_portType" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="bond_hybridType">
+		<xsd:complexContent>
+			<xsd:extension base="bondType">
+				<xsd:attribute name="active" type="xsd:boolean" use="optional" default="true"/>
+			</xsd:extension>
+			<!-- true bond active , false not active-->
+			<!-- true causality next to half arrow, false the opposite-->
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- define a element  for connections-->
+	<xsd:element name="connections">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="line" type="lineType" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element name="line_logic" type="logic_lineType" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element name="bond" type="bondType" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element name="bond_hybrid" type="bond_hybridType" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!-- define a complex type of variable-->
+	<xsd:complexType name="variableType">
+		<xsd:sequence>
+			<xsd:element name="vname" type="rstringm" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="value" type="xsd:float" minOccurs="1" maxOccurs="1"/>
+			<!-- name of variable, must be unique for a list of element -->
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- define a list of parameter for elements -->
+	<xsd:complexType name="list_params">
+		<xsd:sequence>
+			<!-- name of variable, must be unique for a list of element -->
+			<xsd:element name="parameter" type="variableType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- define a list of initial-condition for elements -->
+	<xsd:complexType name="list_ic">
+		<xsd:sequence>
+			<!-- name of variable, must be unique for a list of element -->
+			<xsd:element name="ic" type="variableType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- ''''''''''''''''''''''''''''''' BG element ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''-->
+	<xsd:complexType name="BG-elem_template" abstract="true">
+		<xsd:sequence>
+			<xsd:element name="ports" type="BG_portsType" minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="BG-coupler">
+		<xsd:complexContent>
+			<xsd:extension base="BG-elem_template">
+				<xsd:sequence>
+					<!-- for info
+				<xsd:element name="ports" minOccurs="1" maxOccurs="1">
+					<xsd:complexType>
+						<xsd:complexContent>
+							<xsd:restriction base="BG_portsType">
+								<xsd:sequence>
+									<xsd:element name="signal_in" type="signal_inType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="signal_out" type="signal_outType" minOccurs="0" maxOccurs="unbounded"/>
+									<xsd:element name="logic_in" type="logic_inType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="logic_out" type="logic_outType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="power" type="power-portType" minOccurs="2" maxOccurs="2"/>
+									<xsd:element name="power_hybrid" type="powerhybrid-portType" minOccurs="0" maxOccurs="0"/>
+								</xsd:sequence>
+							</xsd:restriction>
+						</xsd:complexContent>
+					</xsd:complexType>
+				</xsd:element>
+			-->
+					<xsd:element name="gain" type="variableType" minOccurs="1" maxOccurs="1"/>
+					<!-- coupler value m or r-->
+				</xsd:sequence>
+				<xsd:attribute name="type" use="required">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:pattern value="GY"/>
+							<xsd:pattern value="TF"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BG-coupler-modulated">
+		<xsd:complexContent>
+			<xsd:extension base="BG-elem_template">
+				<xsd:sequence>
+					<!-- for info
+				<xsd:element name="ports" minOccurs="1" maxOccurs="1">
+					<xsd:complexType>
+						<xsd:complexContent>
+							<xsd:restriction base="BG_portsType">
+								<xsd:sequence>
+									<xsd:element name="signal_in" type="signal_inType" minOccurs="1" maxOccurs="1"/>
+									<xsd:element name="signal_out" type="signal_outType" minOccurs="0" maxOccurs="unbounded"/>
+									<xsd:element name="logic_in" type="logic_inType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="logic_out" type="logic_outType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="power" type="power-portType" minOccurs="2" maxOccurs="2"/>
+									<xsd:element name="power_hybrid" type="powerhybrid-portType" minOccurs="0" maxOccurs="0"/>
+								</xsd:sequence>
+							</xsd:restriction>
+						</xsd:complexContent>
+					</xsd:complexType>
+				</xsd:element>
+			!-->
+					<xsd:element name="gain" type="variableType" minOccurs="1" maxOccurs="1"/>
+					<!-- coupler value gain m or r ,  gain is m*in or r*in-->
+				</xsd:sequence>
+				<xsd:attribute name="type" use="required">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:pattern value="GY"/>
+							<xsd:pattern value="TF"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BG-source">
+		<xsd:complexContent>
+			<xsd:extension base="BG-elem_template">
+				<xsd:sequence>
+					<!-- for info
+				<xsd:element name="ports" minOccurs="1" maxOccurs="1">
+					<xsd:complexType>
+						<xsd:complexContent>
+							<xsd:restriction base="BG_portsType">
+								<xsd:sequence>
+									<xsd:element name="signal_in" type="signal_inType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="signal_out" type="signal_outType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="logic_in" type="logic_inType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="logic_out" type="logic_outType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="power" type="power-portType" minOccurs="1" maxOccurs="1"/>
+									<xsd:element name="power_hybrid" type="powerhybrid-portType" minOccurs="0" maxOccurs="0"/>
+								</xsd:sequence>
+							</xsd:restriction>
+						</xsd:complexContent>
+					</xsd:complexType>
+				</xsd:element>
+			-->
+					<xsd:element name="S_val" type="variableType" minOccurs="1" maxOccurs="1"/>
+				</xsd:sequence>
+				<xsd:attribute name="type" use="required">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:pattern value="Se"/>
+							<xsd:pattern value="Sf"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BG-source-modulated">
+		<xsd:complexContent>
+			<xsd:extension base="BG-elem_template">
+				<xsd:sequence>
+					<!-- for info
+				<xsd:element name="ports" minOccurs="1" maxOccurs="1">
+					<xsd:complexType>
+						<xsd:complexContent>
+							<xsd:restriction base="BG_portsType">
+								<xsd:sequence>
+									<xsd:element name="signal_in" type="signal_inType" minOccurs="1" maxOccurs="1"/>
+									<xsd:element name="signal_out" type="signal_outType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="logic_in" type="logic_inType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="logic_out" type="logic_outType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="power" type="power-portType" minOccurs="1" maxOccurs="1"/>
+									<xsd:element name="power_hybrid" type="powerhybrid-portType" minOccurs="0" maxOccurs="0"/>
+								</xsd:sequence>
+							</xsd:restriction>
+						</xsd:complexContent>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="S_val" type="variableType" minOccurs="1" maxOccurs="1"/>
+				source value gain g*Se or g*Sf-->
+				</xsd:sequence>
+				<xsd:attribute name="type" use="required">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:pattern value="MSe"/>
+							<xsd:pattern value="MSf"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BG-store">
+		<xsd:complexContent>
+			<xsd:extension base="BG-elem_template">
+				<xsd:sequence>
+					<!-- for info
+				<xsd:element name="ports" minOccurs="1" maxOccurs="1">
+					<xsd:complexType>
+						<xsd:complexContent>
+							<xsd:restriction base="BG_portsType">
+								<xsd:sequence>
+									<xsd:element name="signal_in" type="signal_inType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="signal_out" type="signal_outType" minOccurs="0" maxOccurs="unbounded"/>
+									<xsd:element name="logic_in" type="logic_inType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="logic_out" type="logic_outType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="power" type="power-portType" minOccurs="1" maxOccurs="1"/>
+									<xsd:element name="power_hybrid" type="powerhybrid-portType" minOccurs="0" maxOccurs="0"/>
+								</xsd:sequence>
+							</xsd:restriction>
+						</xsd:complexContent>
+					</xsd:complexType>
+				</xsd:element>
+-->
+					<xsd:element name="K" type="variableType" minOccurs="1" maxOccurs="1"/>
+					<!-- vname must be also C or I-->
+					<!--K=  C or I val-->
+					<xsd:element name="parameters" type="list_params" minOccurs="0" maxOccurs="1"/>
+					<xsd:element name="initial-conditions" type="list_ic" minOccurs="0" maxOccurs="1"/>
+					<xsd:element name="phi" type="rfile_eqts" minOccurs="1" maxOccurs="1"/>
+					<!-- K = C or I are mandatory -->
+					<!-- C : q=phi(e(t)) where dot(q)=f , I :  p=phi(f(t)) where dot(p)=e,   -->
+					<!--for example in electrical c: phi(x) = K*x I: phi(x) = K*x -->
+					<xsd:element name="phi_1" type="rfile_eqts" minOccurs="1" maxOccurs="1"/>
+					<!-- the inverse relationship -->
+				</xsd:sequence>
+				<xsd:attribute name="type" use="required">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:pattern value="C"/>
+							<xsd:pattern value="I"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BG-store-modulated">
+		<xsd:complexContent>
+			<xsd:extension base="BG-elem_template">
+				<xsd:sequence>
+					<!-- for info
+				<xsd:element name="ports" minOccurs="1" maxOccurs="1">
+					<xsd:complexType>
+						<xsd:complexContent>
+							<xsd:restriction base="BG_portsType">
+								<xsd:sequence>
+									<xsd:element name="signal_in" type="signal_inType" minOccurs="1" maxOccurs="1"/>
+									<xsd:element name="signal_out" type="signal_outType" minOccurs="0" maxOccurs="unbounded"/>
+									<xsd:element name="logic_in" type="logic_inType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="logic_out" type="logic_outType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="power" type="power-portType" minOccurs="1" maxOccurs="1"/>
+									<xsd:element name="power_hybrid" type="powerhybrid-portType" minOccurs="0" maxOccurs="0"/>
+								</xsd:sequence>
+							</xsd:restriction>
+						</xsd:complexContent>
+					</xsd:complexType>
+				</xsd:element>
+-->
+					<xsd:element name="K" type="variableType" minOccurs="1" maxOccurs="1"/>
+					<!-- vname must be also C or I-->
+					<!--K=  C or I val-->
+					<xsd:element name="parameters" type="list_params" minOccurs="0" maxOccurs="1"/>
+					<xsd:element name="initial-conditions" type="list_ic" minOccurs="0" maxOccurs="1"/>
+					<xsd:element name="phi" type="rfile_eqts" minOccurs="1" maxOccurs="1"/>
+					<!-- K = C or I are mandatory -->
+					<!-- C : q=phi(e(t)) where dot(q)=f , I :  p=phi(f(t)) where dot(p)=e,   -->
+					<!--for example in electrical c: phi(x) = K*x I: phi(x) = K*x -->
+					<xsd:element name="phi_1" type="rfile_eqts" minOccurs="1" maxOccurs="1"/>
+					<!-- the inverse relationship -->
+				</xsd:sequence>
+				<xsd:attribute name="type" use="required">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:pattern value="C"/>
+							<xsd:pattern value="I"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BG-dissipative">
+		<xsd:complexContent>
+			<xsd:extension base="BG-elem_template">
+				<xsd:sequence>
+					<!-- for info
+				<xsd:element name="ports" minOccurs="1" maxOccurs="1">
+					<xsd:complexType>
+						<xsd:complexContent>
+							<xsd:restriction base="BG_portsType">
+								<xsd:sequence>
+									<xsd:element name="signal_in" type="signal_inType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="signal_out" type="signal_outType" minOccurs="0" maxOccurs="unbounded"/>
+									<xsd:element name="logic_in" type="logic_inType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="logic_out" type="logic_outType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="power" type="power-portType" minOccurs="1" maxOccurs="1"/>
+									<xsd:element name="power_hybrid" type="powerhybrid-portType" minOccurs="0" maxOccurs="0"/>
+								</xsd:sequence>
+							</xsd:restriction>
+						</xsd:complexContent>
+					</xsd:complexType>
+				</xsd:element>
+-->
+					<xsd:element name="R" type="variableType" minOccurs="1" maxOccurs="1"/>
+					<!-- vname must be also R-->
+					<xsd:element name="parameters" type="list_params" minOccurs="0" maxOccurs="1"/>
+					<xsd:element name="phi_R" type="rfile_eqts" minOccurs="1" maxOccurs="1"/>
+					<!-- e = phi_r(f) exemple for a resistance electrical : e = R f  -->
+					<xsd:element name="phi_G" type="rfile_eqts" minOccurs="1" maxOccurs="1"/>
+					<!-- f = phi_G(e) exemple for a resistance electrical : f = (1/R) e  -->
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BG-dissipative-modulated">
+		<xsd:complexContent>
+			<xsd:extension base="BG-elem_template">
+				<xsd:sequence>
+					<!-- for info
+				<xsd:element name="ports" minOccurs="1" maxOccurs="1">
+					<xsd:complexType>
+						<xsd:complexContent>
+							<xsd:restriction base="BG_portsType">
+								<xsd:sequence>
+									<xsd:element name="signal_in" type="signal_inType" minOccurs="1" maxOccurs="1"/>
+									<xsd:element name="signal_out" type="signal_outType" minOccurs="0" maxOccurs="unbounded"/>
+									<xsd:element name="logic_in" type="logic_inType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="logic_out" type="logic_outType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="power" type="power-portType" minOccurs="1" maxOccurs="1"/>
+									<xsd:element name="power_hybrid" type="powerhybrid-portType" minOccurs="0" maxOccurs="0"/>
+								</xsd:sequence>
+							</xsd:restriction>
+						</xsd:complexContent>
+					</xsd:complexType>
+				</xsd:element>
+-->
+					<xsd:element name="R" type="variableType" minOccurs="1" maxOccurs="1"/>
+					<!-- vname must be also R-->
+					<xsd:element name="parameters" type="list_params" minOccurs="0" maxOccurs="1"/>
+					<xsd:element name="phi_R" type="rfile_eqts" minOccurs="1" maxOccurs="1"/>
+					<!-- e = phi_r(f) exemple for a resistance electrical : e = R f  -->
+					<xsd:element name="phi_G" type="rfile_eqts" minOccurs="1" maxOccurs="1"/>
+					<!-- f = phi_G(e) exemple for a resistance electrical : f = (1/R) e  -->
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BG-detector">
+		<xsd:complexContent>
+			<xsd:extension base="BG-elem_template">
+				<xsd:sequence>
+					<!-- for info
+				<xsd:element name="ports" minOccurs="1" maxOccurs="1">
+					<xsd:complexType>
+						<xsd:complexContent>
+							<xsd:restriction base="BG_portsType">
+								<xsd:sequence>
+									<xsd:element name="signal_in" type="signal_inType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="signal_out" type="signal_outType" minOccurs="1" maxOccurs="1"/>
+									<xsd:element name="logic_in" type="logic_inType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="logic_out" type="logic_outType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="power" type="power-portType" minOccurs="1" maxOccurs="1"/>
+									<xsd:element name="power_hybrid" type="powerhybrid-portType" minOccurs="0" maxOccurs="0"/>
+								</xsd:sequence>
+							</xsd:restriction>
+						</xsd:complexContent>
+					</xsd:complexType>
+				</xsd:element>
+-->
+				</xsd:sequence>
+				<xsd:attribute name="type" use="required">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:pattern value="De"/>
+							<xsd:pattern value="Df"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+				<xsd:attribute name="redundancy" type="xsd:int" use="required"/>
+			</xsd:extension>
+			<!-- number of redudancy, 0 no redudancy -->
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BG-junction">
+		<xsd:complexContent>
+			<xsd:extension base="BG-elem_template">
+				<xsd:sequence>
+					<!-- for info
+				<xsd:element name="ports" minOccurs="1" maxOccurs="1">
+					<xsd:complexType>
+						<xsd:complexContent>
+							<xsd:restriction base="BG_portsType">
+								<xsd:sequence>
+									<xsd:element name="signal_in" type="signal_inType" minOccurs="0" maxOccurs="1"/>
+									for diagnosis 
+									<xsd:element name="signal_out" type="signal_outType" minOccurs="1" maxOccurs="unbounded"/>
+									<xsd:element name="logic_in" type="logic_inType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="logic_out" type="logic_outType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="power" type="power-portType" minOccurs="2" maxOccurs="unbounded"/>
+									<xsd:element name="power_hybrid" type="powerhybrid-portType" minOccurs="0" maxOccurs="0"/>
+								</xsd:sequence>
+							</xsd:restriction>
+						</xsd:complexContent>
+					</xsd:complexType>
+				</xsd:element>
+		-->
+				</xsd:sequence>
+				<xsd:attribute name="type" use="required">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:pattern value="1"/>
+							<xsd:pattern value="0"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BGH-controlled_junction">
+		<xsd:complexContent>
+			<xsd:extension base="BG-elem_template">
+				<xsd:sequence>
+					<!-- for info
+				<xsd:element name="ports" minOccurs="1" maxOccurs="1">
+					<xsd:complexType>
+						<xsd:complexContent>
+							<xsd:restriction base="BG_portsType">
+								<xsd:sequence>
+									<xsd:element name="signal_in" type="signal_inType" minOccurs="0" maxOccurs="0"/>
+									boolean associated to the controle junctrion ; true(not 0 (mostly 1)) on active , false(0) not active off
+									<xsd:element name="signal_out" type="signal_outType" minOccurs="0" maxOccurs="unbounded"/>
+									<xsd:element name="logic_in" type="logic_inType" minOccurs="1" maxOccurs="1"/>
+									<xsd:element name="logic_out" type="logic_outType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="power" type="power-portType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="power_hybrid" type="powerhybrid-portType" minOccurs="1" maxOccurs="unbounded"/>
+								</xsd:sequence>
+							</xsd:restriction>
+						</xsd:complexContent>
+					</xsd:complexType>
+				</xsd:element>
+		-->
+				</xsd:sequence>
+				<xsd:attribute name="type" use="required">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:pattern value="1c"/>
+							<xsd:pattern value="0c"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BGH-switched_power_junction">
+		<xsd:complexContent>
+			<xsd:extension base="BG-elem_template">
+				<xsd:sequence>
+					<!-- for info
+				<xsd:element name="ports" minOccurs="1" maxOccurs="1">
+					<xsd:complexType>
+						<xsd:complexContent>
+							<xsd:restriction base="BG_portsType">
+								<xsd:sequence>
+									<xsd:element name="signal_in" type="signal_inType" minOccurs="0" maxOccurs="0"/>
+								 boolean associated to the controle junctrion ; true(not 0 (mostly 1)) on active , false(0) not active off
+									<xsd:element name="signal_out" type="signal_outType" minOccurs="1" maxOccurs="unbounded"/>
+									<xsd:element name="logic_in" type="logic_inType" minOccurs="1" maxOccurs="1"/>
+									<xsd:element name="logic_out" type="logic_outType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="power" type="power-portType" minOccurs="1" maxOccurs="unbounded"/>
+									<xsd:element name="power_hybrid" type="powerhybrid-portType" minOccurs="2" maxOccurs="unbounded"/>
+								</xsd:sequence>
+							</xsd:restriction>
+						</xsd:complexContent>
+					</xsd:complexType>
+				</xsd:element>	
+		-->
+				</xsd:sequence>
+				<xsd:attribute name="type" use="required">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:pattern value="1s"/>
+							<xsd:pattern value="0s"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- no integrator or something special else , wait new ver for that-->
+	<xsd:complexType name="BG-port">
+		<xsd:complexContent>
+			<xsd:extension base="BG-elem_template">
+				<xsd:sequence>
+					<!-- for info
+				<xsd:element name="ports" minOccurs="1" maxOccurs="1">
+					<xsd:complexType>
+						<xsd:complexContent>
+							<xsd:restriction base="BG_portsType">
+								<xsd:sequence>
+									<xsd:element name="signal_in" type="signal_inType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="signal_out" type="signal_outType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="logic_in" type="logic_inType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="logic_out" type="logic_outType" minOccurs="0" maxOccurs="0"/>
+									<xsd:element name="power" type="power-portType" minOccurs="1" maxOccurs="1"/>
+									<xsd:element name="power_hybrid" type="powerhybrid-portType" minOccurs="0" maxOccurs="0"/>
+								</xsd:sequence>
+							</xsd:restriction>
+						</xsd:complexContent>
+					</xsd:complexType>
+				</xsd:element>
+		-->
+					<xsd:element name="ref_id" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+					<!-- id to the higher level conected port-->
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- define a complex type for submodel-->
+	<xsd:complexType name="BGBD-elementType">
+		<xsd:choice>
+			<xsd:element name="BG_elem" type="BG-elem_template">
+				<xsd:unique name="unique-BG-portid">
+					<xsd:selector xpath="ports/*"/>
+					<!-- selects books on all shelves -->
+					<xsd:field xpath="@id"/>
+				</xsd:unique>
+			</xsd:element>
+			<xsd:element name="BD_elem" type="BD-elem_template">
+				<xsd:unique name="unique-BD-portid">
+					<xsd:selector xpath="ports/*"/>
+					<!-- selects books on all shelves -->
+					<xsd:field xpath="@id"/>
+				</xsd:unique>
+			</xsd:element>
+		</xsd:choice>
+	</xsd:complexType>
+	<!-- ''''''''''''''''''''''''''''''' models and submodel ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''-->
+	<!-- define a complex type for submodel-->
+	<xsd:complexType name="BGBD_modelType">
+		<xsd:sequence>
+			<xsd:element name="info" type="model-infoType" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="position" type="Position_type" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="graphic" type="rfile_svg_png" minOccurs="0" maxOccurs="1"/>
+			<xsd:choice>
+				<xsd:element name="path_to_BGBD" type="rfile"/>
+				<!-- path to another BGBD-model-->
+				<xsd:element name="composed-submodel" type="composed_modelType"/>
+				<xsd:element name="BGBD-element" type="BGBD-elementType"/>
+			</xsd:choice>
+		</xsd:sequence>
+		<xsd:attribute name="name" type="rstring" use="required"/>
+		<xsd:attribute name="id" type="xsd:int" use="required"/>
+		<xsd:attribute name="path_to_BGBD_lib" type="rfile" use="optional"/>
+		<!-- 0 if no id avalaible-->
+		<!-- path to its own location if it is a root, or path to bg lib if it was a copied element from library-->
+	</xsd:complexType>
+	<!-- define a complex type for models-->
+	<xsd:element name="submodels">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="submodel" type="BGBD_modelType" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!-- define a composed-model-->
+	<xsd:complexType name="composed_modelType">
+		<xsd:sequence>
+			<xsd:element ref="submodels"/>
+			<xsd:element ref="connections"/>
+			<xsd:element name="ports" type="BG_portsType" minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- for code synthesis unique prt-->
+	<xsd:complexType name="BGBD_rootType">
+		<xsd:sequence>
+			<!-- Define general structure of BGML, root node-->
+			<xsd:element name="BGBD_model" type="BGBD_modelType" minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="BGBD_root" type="BGBD_rootType"/>
+</xsd:schema>
