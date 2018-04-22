@@ -322,11 +322,11 @@
 					<!--K=  C or I val-->
 					<xsd:element name="parameters" type="list_params" minOccurs="0" maxOccurs="1"/>
 					<xsd:element name="initial-conditions" type="list_ic" minOccurs="0" maxOccurs="1"/>
-					<xsd:element name="phi" type="rfile_eqts" minOccurs="1" maxOccurs="1"/>
+					<xsd:element name="integral" type="rfile_eqts" minOccurs="1" maxOccurs="1"/>
 					<!-- K = C or I are mandatory -->
 					<!-- C : q=phi(e(t)) where dot(q)=f , I :  p=phi(f(t)) where dot(p)=e,   -->
 					<!--for example in electrical c: phi(x) = K*x I: phi(x) = K*x -->
-					<xsd:element name="phi_1" type="rfile_eqts" minOccurs="1" maxOccurs="1"/>
+					<xsd:element name="derivative" type="rfile_eqts" minOccurs="1" maxOccurs="1"/>
 					<!-- the inverse relationship -->
 				</xsd:sequence>
 				<xsd:attribute name="type" use="required">
@@ -367,11 +367,11 @@
 					<!--K=  C or I val-->
 					<xsd:element name="parameters" type="list_params" minOccurs="0" maxOccurs="1"/>
 					<xsd:element name="initial-conditions" type="list_ic" minOccurs="0" maxOccurs="1"/>
-					<xsd:element name="phi" type="rfile_eqts" minOccurs="1" maxOccurs="1"/>
+					<xsd:element name="integral" type="rfile_eqts" minOccurs="1" maxOccurs="1"/>
 					<!-- K = C or I are mandatory -->
-					<!-- C : q=phi(e(t)) where dot(q)=f , I :  p=phi(f(t)) where dot(p)=e,   -->
+					<!-- C : int : q=phi(e(t)) where dot(q)=f , deriv I :  p=phi(f(t)) where dot(p)=e,   -->
 					<!--for example in electrical c: phi(x) = K*x I: phi(x) = K*x -->
-					<xsd:element name="phi_1" type="rfile_eqts" minOccurs="1" maxOccurs="1"/>
+					<xsd:element name="derivative" type="rfile_eqts" minOccurs="1" maxOccurs="1"/>
 					<!-- the inverse relationship -->
 				</xsd:sequence>
 				<xsd:attribute name="type" use="required">
@@ -410,9 +410,9 @@
 					<xsd:element name="R" type="variableType" minOccurs="1" maxOccurs="1"/>
 					<!-- vname must be also R-->
 					<xsd:element name="parameters" type="list_params" minOccurs="0" maxOccurs="1"/>
-					<xsd:element name="phi_R" type="rfile_eqts" minOccurs="1" maxOccurs="1"/>
+					<xsd:element name="resistive" type="rfile_eqts" minOccurs="1" maxOccurs="1"/>
 					<!-- e = phi_r(f) exemple for a resistance electrical : e = R f  -->
-					<xsd:element name="phi_G" type="rfile_eqts" minOccurs="1" maxOccurs="1"/>
+					<xsd:element name="conductive" type="rfile_eqts" minOccurs="1" maxOccurs="1"/>
 					<!-- f = phi_G(e) exemple for a resistance electrical : f = (1/R) e  -->
 				</xsd:sequence>
 			</xsd:extension>
@@ -443,9 +443,9 @@
 					<xsd:element name="R" type="variableType" minOccurs="1" maxOccurs="1"/>
 					<!-- vname must be also R-->
 					<xsd:element name="parameters" type="list_params" minOccurs="0" maxOccurs="1"/>
-					<xsd:element name="phi_R" type="rfile_eqts" minOccurs="1" maxOccurs="1"/>
+					<xsd:element name="resistive" type="rfile_eqts" minOccurs="1" maxOccurs="1"/>
 					<!-- e = phi_r(f) exemple for a resistance electrical : e = R f  -->
-					<xsd:element name="phi_G" type="rfile_eqts" minOccurs="1" maxOccurs="1"/>
+					<xsd:element name="conductive" type="rfile_eqts" minOccurs="1" maxOccurs="1"/>
 					<!-- f = phi_G(e) exemple for a resistance electrical : f = (1/R) e  -->
 				</xsd:sequence>
 			</xsd:extension>
